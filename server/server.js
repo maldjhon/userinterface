@@ -3,12 +3,19 @@ const path = require('path');
 const multer = require('multer');
 const cors = require('cors');
 const mysql = require('mysql2');
+const { json } = require('stream/consumers');
 const app = express();
 const port = 3001;
 const allowedOrigins = [
     'http://127.0.0.1:5500',
     'http://localhost:3001'
 ];
+
+// Middleware para parsear JSON
+app.use(express.json());
+
+// Middleware para parsear datos de formularios
+app.use(express.urlencoded({ extended: true }));
 
 // Configurar la conexión a MySQL
 const connection = mysql.createConnection({
@@ -36,7 +43,12 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage, 
+    limits: {
+        fieldSize: 25 * 1024 * 1024 // Aumenta el límite a 25 MB
+    }
+});
 
 // Configura CORS para permitir solicitudes desde tu origen
 app.use(cors({
@@ -51,19 +63,38 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.post('/',upload.none(),(req, res) =>{
+    const usuario = req.body.usuario;
+    const contrasena = req.body.contrasena;
+    const query = 'SELECT * FROM dev.usuarios WHERE usuario = ? and contraseña = ?';
+    connection.query(query, [usuario,contrasena], (error, results) => {
+        if (error) {
+            console.error('Error en la consulta:', error);
+            res.status(500).json({mensaje:"Error al consultar el usuario",code:error})
+        }else if (results.length == 1){
+            console.log('Datos consultador en la base de datos:', results);
+            res.json({ mensaje: 'El usuario se encuentra registrado',code: 'OK'});
+        }else{
+            console.error('Error en la consulta:', error);
+            res.status(500).json({mensaje:"Error al consultar el usuario "+usuario,code:'Sin registros'})
+        }
+    });
+})
+
 app.get('/upload', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/html', 'upload.html'));
 });
 
 // Ruta para manejar la subida de archivos y guardar en la base de datos
-app.post('/subir', upload.single('archivo'), (req, res) => {
+app.post('/subir', upload.none(), (req, res) => {
     const nombre = req.body.nombre;
-    const archivo = req.file.filename; // Obtén el nombre del archivo guardado
+    const archivo = req.body.archivo; // Obtén el nombre del archivo guardado
 
     // Crear una consulta SQL para insertar los datos
     const sql = 'INSERT INTO documentos (nombre, archivo) VALUES (?, ?)';
+    const buffer = Buffer.from(archivo, 'base64');
 
-    connection.query(sql, [nombre, archivo], (err, result) => {
+    connection.query(sql, [nombre, buffer], (err, result) => {
         if (err) {
             console.error('Error al insertar en la base de datos:', err);
             res.status(500).json({ error: 'Error al guardar en la base de datos' });
@@ -73,6 +104,26 @@ app.post('/subir', upload.single('archivo'), (req, res) => {
             res.json({ mensaje: 'Archivo recibido y guardado con éxito', nombre: nombre, archivo: archivo });
         }
     });
+});
+
+// Ruta para obtener los documentos
+app.get('/documentos', (req, res) => {
+    const sql = 'select * from documentos';
+    connection.query(sql,(err,results) => {
+        if (err) {
+            console.error('Error al consultar en la base de datos:', err);
+            res.status(500).json({ mensaje: 'Error al consultar en la base de datos:',codigo:err});
+            return;
+        }else{
+            const documents = results.map(row => ({
+                id: row.id,
+                nombre: row.nombre,
+                archivo: Buffer.from(row.archivo).toString('base64')
+            }));
+            console.log('Datos consultados en la base de datos:', documents);
+            res.json({ mensaje: documents, codigo: 'OK' });
+        }
+    })
 });
 
 // Iniciar el servidor
