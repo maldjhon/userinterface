@@ -26,4 +26,4 @@ jobs:
       run: npm install
 
     - name: Run script
-      run: node server/server.js # Reemplaza "tu-script.js" con el archivo que desees ejecutar
+      run: ls -ltr # Reemplaza "tu-script.js" con el archivo que desees ejecutar
