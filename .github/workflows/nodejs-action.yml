@@ -25,5 +25,8 @@ jobs:
       working-directory: server/
       run: npm install
 
-    - name: Run script
+    - name: Make server.js executable
+      run: chmod +x ./server/server.js
+
+    - name: Run server
       run: ./server/server.js
