@@ -26,4 +26,4 @@ jobs:
       run: npm install
 
     - name: Run script
-      run: chmod 775 ./server/server.js
+      run: ./server/server.js
