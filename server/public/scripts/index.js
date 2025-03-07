@@ -24,7 +24,7 @@ document.getElementById('btnIngresar').addEventListener('click', function() {
         let mensaje = data.mensaje;
         let codigo = data.code;
         if (codigo == 'OK'){
-            window.location.href="http://localhost:3001/upload";
+            window.location.href="http://localhost:3001/customer";
         }else{
             alert(mensaje+" , "+codigo);
         }

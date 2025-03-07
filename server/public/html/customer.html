@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applets</title>
+    <link rel="stylesheet" href="../css/customer.css">
+</head>
+<body>
+    <div>
+        <h2>Applet de Clientes</h2>
+        <button onclick="mostrarModal()">Ingresar información</button>
+        <div class="padreCliente" id="clientes">
+            <div class="clientes">
+                <div><span>Id</span></div>
+                <div><span>Nombre</span></div>
+                <div><span>Documento</span></div>
+                <div><span>Fecha Expedición</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="validacion">
+        <h2>Applet de Validación</h2>
+        <!-- Funcionalidades relacionadas con validación -->
+    </div>
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h3>Ingrese los datos</h3>
+            <input type="text" id="nombre" placeholder="Nombre">
+            <input type="text" id="documento" placeholder="Documento">
+            <input type="date" id="fecha_expedicion" placeholder="Fecha de Expedición">
+            <button onclick="guardarInformacion()">Guardar</button>
+            <button onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+    <script src="../scripts/customer.js"></script>
+</body>
+</html>

@@ -1,9 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const multer = require('multer');
 const cors = require('cors');
 const mysql = require('mysql2');
 const { json } = require('stream/consumers');
+const { leerYDescifrar} = require('./public/scripts/descifrado'); // Importar funciones desde cifrado.js
 const app = express();
 const port = 3001;
 const allowedOrigins = [
@@ -18,10 +20,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configurar la conexión a MySQL
+let valor = leerYDescifrar ();
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
+    host: process.env.HOST,
+    user: process.env.USER,
+    password: valor,
     database: 'dev'
 });
 
@@ -63,6 +66,14 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.get('/upload', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/html', 'upload.html'));
+});
+
+app.get('/customer', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/html', 'customer.html'));
+});
+
 app.post('/',upload.none(),(req, res) =>{
     const usuario = req.body.usuario;
     const contrasena = req.body.contrasena;
@@ -79,10 +90,43 @@ app.post('/',upload.none(),(req, res) =>{
             res.status(500).json({mensaje:"Error al consultar el usuario "+usuario,code:'Sin registros'})
         }
     });
-})
+});
 
-app.get('/upload', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/html', 'upload.html'));
+// Ruta para guardar clientes en la base de datos
+app.post('/customer', upload.none(), (req, res) => {
+    const nombre = req.body.nombre;
+    const documento = req.body.documento; 
+    const fechaExpedicion = req.body.fechaExpedicion;
+
+    // Crear una consulta SQL para insertar los datos
+    const sql = 'INSERT INTO clientes (nombre, documento, fecha_expedicion) VALUES (?, ?, ?)';
+
+    connection.query(sql, [nombre, documento, fechaExpedicion], (err, result) => {
+        if (err) {
+            console.error('Error al insertar en la base de datos:', err);
+            res.status(500).json({ error: 'Error al guardar en la base de datos' });
+            return;
+        }else{
+            console.log('Datos insertados en la base de datos:', result);
+            res.json({ mensaje: 'Cliente guardado con éxito', codigo:'OK'});
+        }
+    });
+});
+
+// Ruta para obtener los clientes
+app.get('/customers', (req, res) => {
+    const sql = 'select * from clientes';
+    connection.query(sql,(err,results) => {
+        if (err) {
+            console.error('Error al consultar en la base de datos:', err);
+            res.status(500).json({ mensaje: 'Error al consultar en la base de datos:',codigo:err});
+            return;
+        }else if (results.length > 0){
+            res.json({ mensaje: results, codigo: 'OK'});
+        }else{
+            res.status(500).json({ mensaje: 'La consulta no retorna registros',codigo:'NOTOK'});
+        }
+    })
 });
 
 // Ruta para manejar la subida de archivos y guardar en la base de datos
