@@ -7,6 +7,9 @@ const rutaCifrado = process.env.PATH_CIPHER;
 
 // Función para generar una clave de 32 bytes y guardarla en un archivo
 function generarClaveYGuardar(rutaClave) {
+  if (!rutaClave) {
+    throw new Error('La ruta de la clave no está definida');
+  }
   const clave = crypto.randomBytes(32); // Genera una clave aleatoria de 32 bytes
   fs.writeFileSync(rutaClave, clave);
   console.log(`Clave generada y guardada en ${rutaClave}`);
@@ -20,6 +23,9 @@ function leerClave(rutaClave) {
 
 // Función para cifrar un valor y guardarlo en un archivo
 function cifrarYGuardar(texto, rutaClave, rutaCifrado) {
+    if (!rutaClave || !rutaCifrado) {
+      throw new Error('Las rutas de la clave y del cifrado no están definidas');
+    }
     generarClaveYGuardar(rutaClave);
     const clave = leerClave(rutaClave);
     const algoritmo = 'aes-256-cbc';

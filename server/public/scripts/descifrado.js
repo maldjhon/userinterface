@@ -6,12 +6,18 @@ const rutaCifrado = process.env.PATH_CIPHER_DES;
 
 // Función para leer la clave desde un archivo
 function leerClave(rutaClave) {
+  if (!rutaClave) {
+    throw new Error('La ruta de la clave no está definida');
+  }
   const clave = fs.readFileSync(rutaClave);
   return clave;
 }
 
 // Función para leer y descifrar los datos desde un archivo
 function leerYDescifrar() {
+  if (!rutaClave || !rutaCifrado) {
+    throw new Error('Las rutas de la clave y del cifrado no están definidas');
+  }
   const clave = leerClave(rutaClave);
   const algoritmo = 'aes-256-cbc';
   const datoCifrado = fs.readFileSync(rutaCifrado, 'utf8');
