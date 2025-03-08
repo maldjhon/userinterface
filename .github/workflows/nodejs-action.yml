@@ -28,5 +28,5 @@ jobs:
     - name: Make server.js executable
       run: chmod +x ./server/server.js
 
-    - name: Run server
+    #- name: Run server
       #run: node ./server/server.js
