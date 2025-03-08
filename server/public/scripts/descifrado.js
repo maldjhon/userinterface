@@ -1,8 +1,9 @@
-require('dotenv').config({ path: '../../.env' });
+require('dotenv').config();
 const crypto = require('crypto');
 const fs = require('fs');
 const rutaClave = process.env.PATH_KEY_DES;
 const rutaCifrado = process.env.PATH_CIPHER_DES;
+console.log(rutaClave,rutaCifrado);
 
 // Función para leer la clave desde un archivo
 function leerClave(rutaClave) {
