@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: './server/.env' });
 const crypto = require('crypto');
 const fs = require('fs');
 const rutaClave = process.env.PATH_KEY_DES;
