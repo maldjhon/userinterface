@@ -29,4 +29,8 @@ jobs:
       run: chmod +x ./server/server.js
 
     - name: Run server
-      run: node ./server/server.js
+      run: cd /home/runner/work/userinterface/userinterface/server/public/scripts
+      #run: node ./server/server.js
+
+    - name: Validate path
+      run: cat ../../.env
