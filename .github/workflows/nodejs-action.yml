@@ -33,4 +33,4 @@ jobs:
       #run: node ./server/server.js
 
     - name: Validate path
-      run: ls -ltr ../
+      run: ls -ltr ./
