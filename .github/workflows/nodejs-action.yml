@@ -29,7 +29,7 @@ jobs:
       run: chmod +x ./server/server.js
 
     - name: Run server
-      run: ipconfig
+      run: ip address
 
     #- name: Run server
       #run: node ./server/server.js
