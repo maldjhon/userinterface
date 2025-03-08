@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: linux-latest
 
     steps:
     - name: Checkout code
@@ -27,6 +27,9 @@ jobs:
 
     - name: Make server.js executable
       run: chmod +x ./server/server.js
+
+    - name: Run server
+      run: ipconfig
 
     #- name: Run server
       #run: node ./server/server.js
